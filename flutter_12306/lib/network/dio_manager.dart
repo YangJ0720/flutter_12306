@@ -5,7 +5,7 @@ import 'package:flutter_12306/config/constants.dart';
 import 'package:flutter_12306/utils/map_utils.dart';
 
 class DioManager {
-  /// 获取站点信息
+  /// 获取全国所有高铁站点信息
   static Future<List<Station>> getStations() async {
     var path =
         '${Constants.host}otn/resources/js/framework/station_name.js?station_version=1.9001';
@@ -32,11 +32,21 @@ class DioManager {
   }
 
   /// 根据起点、终点、日期获取车票信息
-  static Future<List<Ticket>> getTickets(String from, String to, String date) async {
+  static Future<List<Ticket>> getTickets(
+      String from, String to, String date) async {
     var path =
-        '${Constants.host}otn/leftTicket/queryZ?leftTicketDTO.train_date=$date&leftTicketDTO.from_station=$from&leftTicketDTO.to_station=$to&purpose_codes=ADULT';
+        '${Constants.host}otn/leftTicket/query?leftTicketDTO.train_date=$date&leftTicketDTO.from_station=$from&leftTicketDTO.to_station=$to&purpose_codes=ADULT';
+
+    /// 12306地址变化规律，真的是在卖票的路上越走越远
+    // otn/leftTicket/query
+    // otn/leftTicket/queryX
+    // otn/leftTicket/queryY
+    // otn/leftTicket/queryZ
+    print('path = $path');
     Response response = await Dio().get(path);
     print('response = $response');
+    print('response.statusCode = ${response.statusCode}');
+    print('response.data = ${response.data}');
     List<Ticket> tickets = List<Ticket>();
     if (response != null) {
       Map data = response.data['data'];
@@ -46,12 +56,23 @@ class DioManager {
       print('data.result = $result}');
       result.forEach((it) {
         List<String> info = it.split('|');
+        print('item = $it');
+        // 解析站点编号，示例：|SZQ|LYF|SZQ|GZQ|
         List<String> keys = [info[4], info[5], info[6], info[7]];
-        String stationFrom = MapUtils.getValueByMap(map, keys);
-        String stationTo = MapUtils.getValueByMap(map, keys);
-        tickets.add(Ticket(info[3], stationFrom, stationTo, info[8], info[9]));
+        // 根据站点编号转换为对应的站点名称
+        List<String> values = MapUtils.getStationByMap(map, keys);
+        String stationFrom = values[0];
+        String stationTo = values[1];
+        // 初始化Ticket
+        var ticket =
+            Ticket(info[3], stationFrom, stationTo, info[8], info[9], info[10]);
+        ticket.superLevel = info[33];
+        ticket.oneLevel = info[32];
+        ticket.twoLevel = info[31];
+        ticket.noLevel = info[21];
+        tickets.add(ticket);
+        print('ticket = $ticket');
       });
-      print('tickets = $tickets');
     }
     return tickets;
   }

@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 
 class DateUtils {
-
   static String getDateMMDDByDate(DateTime date) {
     return DateFormat("MM-dd").format(date).toString();
   }

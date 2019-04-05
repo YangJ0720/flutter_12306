@@ -20,6 +20,14 @@ class DrawerListView extends StatelessWidget {
             style: TextStyle(fontSize: 16),
           ),
         ),
+        Row(
+          children: <Widget>[
+            Icon(Icons.info),
+            Text('关于我们'),
+          ],
+        ),
+        RaisedButton.icon(
+            onPressed: () {}, icon: Icon(Icons.info), label: Text('关于我们')),
         Container(
           padding: EdgeInsets.all(10.0),
           child: Text(

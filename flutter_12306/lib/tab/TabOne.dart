@@ -5,6 +5,7 @@ import 'package:flutter_12306/network/dio_manager.dart';
 import 'package:flutter_12306/railway_ticket.dart';
 import 'package:flutter_12306/utils/DateUtils.dart';
 
+/// 选项卡：查询
 class TabOne extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -23,15 +24,20 @@ class TabOneHomePageState extends State<TabOneHomePage> {
   Station stationFrom;
   Station stationTo;
   DateTime dateTime;
-
+  bool isFast;
+  bool isStudent;
 
   TabOneHomePageState() {
+    // 默认起点站
     this.stationFrom = Station('IOQ', '深圳北');
+    // 默认终点站
     this.stationTo = Station('IZQ', '广州南');
+    // 默认日期
     this.dateTime = DateTime.now();
-
-    print('TabOneHomePageState -> stationFrom = ${stationFrom.name}');
-    print('TabOneHomePageState -> stationTo = ${stationTo.name}');
+    // 高铁动车
+    this.isFast = false;
+    // 学生票
+    this.isStudent = false;
   }
 
   @override
@@ -40,8 +46,23 @@ class TabOneHomePageState extends State<TabOneHomePage> {
       padding: EdgeInsets.all(5.0),
       child: Column(
         children: <Widget>[
-          LocationStationWidget(stationFrom, stationTo),
-          DateTimeWidget(dateTime),
+          LocationStationWidget(
+            valueChanged: (list) {
+              setState(() {
+                stationFrom = list[0];
+                stationTo = list[1];
+              });
+            },
+            stationFrom: stationFrom,
+            stationTo: stationTo,
+          ),
+          DateTimeWidget(
+              valueChanged: (value) {
+                setState(() {
+                  dateTime = value;
+                });
+              },
+              dateTime: dateTime),
           Container(
             padding: EdgeInsets.all(10),
             child: Row(
@@ -53,7 +74,14 @@ class TabOneHomePageState extends State<TabOneHomePage> {
                       '高铁动车',
                       style: TextStyle(fontSize: 14),
                     ),
-                    Checkbox(value: false, onChanged: (bool value) {}),
+                    Checkbox(
+                      value: isFast,
+                      onChanged: (bool value) {
+                        setState(() {
+                          isFast = value;
+                        });
+                      },
+                    ),
                   ],
                 ),
                 Row(
@@ -62,7 +90,14 @@ class TabOneHomePageState extends State<TabOneHomePage> {
                       '学生票',
                       style: TextStyle(fontSize: 14),
                     ),
-                    Checkbox(value: false, onChanged: (bool value) {}),
+                    Checkbox(
+                      value: isStudent,
+                      onChanged: (bool value) {
+                        setState(() {
+                          isStudent = value;
+                        });
+                      },
+                    ),
                   ],
                 ),
               ],
@@ -102,22 +137,20 @@ class TabOneHomePageState extends State<TabOneHomePage> {
 
 /// 起点站和终点站
 class LocationStationWidget extends StatefulWidget {
-  final Station stationFrom;
-  final Station stationTo;
+  final ValueChanged<List<Station>> valueChanged;
+  var stationFrom;
+  var stationTo;
 
-  LocationStationWidget(this.stationFrom, this.stationTo);
+  LocationStationWidget({this.valueChanged, this.stationFrom, this.stationTo});
 
   @override
-  LocationStationWidgetState createState() =>
-      LocationStationWidgetState(stationFrom, stationTo);
+  LocationStationWidgetState createState() => LocationStationWidgetState();
 }
 
 class LocationStationWidgetState extends State<LocationStationWidget> {
   List<Station> stations;
-  Station stationFrom;
-  Station stationTo;
 
-  LocationStationWidgetState(this.stationFrom, this.stationTo) {
+  LocationStationWidgetState() {
     requestStations();
   }
 
@@ -127,11 +160,15 @@ class LocationStationWidgetState extends State<LocationStationWidget> {
     Scaffold.of(context).showSnackBar(SnackBar(content: Text('站点数据加载完毕')));
   }
 
+  /// 更换起点站和终点站
   void _exchangeLocation() {
     setState(() {
-      final Station temp = stationFrom;
-      stationFrom = stationTo;
-      stationTo = temp;
+      final Station temp = widget.stationFrom;
+      widget.stationFrom = widget.stationTo;
+      widget.stationTo = temp;
+      // 回调到父Widget
+      List<Station> list = [widget.stationFrom, widget.stationTo];
+      widget.valueChanged(list);
     });
   }
 
@@ -144,7 +181,7 @@ class LocationStationWidgetState extends State<LocationStationWidget> {
       children: <Widget>[
         MaterialButton(
             child: Text(
-              '${stationFrom.name}',
+              '${widget.stationFrom.name}',
               style: TextStyle(fontSize: 18),
             ),
             onPressed: () async {
@@ -154,25 +191,34 @@ class LocationStationWidgetState extends State<LocationStationWidget> {
                 return;
               }
               setState(() {
-                stationFrom = station;
-                print('stationFrom = ${stationFrom.name}');
+                widget.stationFrom = station;
+                print(
+                    'station.code = ${station.code}, station.name = ${station.name}');
+                // 回调到父Widget
+                List<Station> list = [widget.stationFrom, widget.stationTo];
+                widget.valueChanged(list);
               });
             }),
         IconButton(
-            icon: Icon(Icons.cached),
+            icon: Icon(Icons.repeat),
             onPressed: () {
               _exchangeLocation();
             }),
         MaterialButton(
             child: Text(
-              '${stationTo.name}',
+              '${widget.stationTo.name}',
               style: TextStyle(fontSize: 18),
             ),
             onPressed: () async {
               final Station station = await showSearch(
                   context: context, delegate: SearchStationDelegate(stations));
               setState(() {
-                stationTo = station;
+                widget.stationTo = station;
+                print(
+                    'station.code = ${station.code}, station.name = ${station.name}');
+                // 回调到父Widget
+                List<Station> list = [widget.stationFrom, widget.stationTo];
+                widget.valueChanged(list);
               });
             })
       ],
@@ -182,28 +228,34 @@ class LocationStationWidgetState extends State<LocationStationWidget> {
 
 /// 乘车日期
 class DateTimeWidget extends StatefulWidget {
-  final DateTime dateTime;
+  ValueChanged<DateTime> valueChanged;
+  DateTime dateTime;
 
-  DateTimeWidget(this.dateTime);
+  DateTimeWidget({this.valueChanged, this.dateTime});
 
   @override
-  DateTimeWidgetState createState() => DateTimeWidgetState(dateTime);
+  DateTimeWidgetState createState() => DateTimeWidgetState();
 }
 
 class DateTimeWidgetState extends State<DateTimeWidget> {
-  DateTime dateTime;
-
-  DateTimeWidgetState(this.dateTime);
-
   void _selectDate(BuildContext context) {
+    var _dateTime = DateTime.now();
+    var _firstDate = DateTime(_dateTime.year, _dateTime.month, _dateTime.day);
+    var _lastDate =
+        DateTime(_firstDate.year, _firstDate.month + 1, _firstDate.day);
     showDatePicker(
             context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2018),
-            lastDate: DateTime(2020))
+            initialDate: _firstDate,
+            firstDate: _firstDate,
+            lastDate: _lastDate)
         .then<DateTime>((DateTime value) {
       setState(() {
-        dateTime = value;
+        // 如果用户点击cancel会返回null
+        if (value == null) {
+          return;
+        }
+        widget.dateTime = value;
+        widget.valueChanged(value);
       });
     });
   }
@@ -219,7 +271,7 @@ class DateTimeWidgetState extends State<DateTimeWidget> {
           Expanded(
             child: MaterialButton(
               child: Text(
-                '${DateUtils.getDateMMDDByDate(dateTime)}',
+                '${DateUtils.getDateMMDDByDate(widget.dateTime)}',
                 style: TextStyle(fontSize: 18),
               ),
               onPressed: () {

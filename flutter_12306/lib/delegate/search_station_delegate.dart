@@ -8,10 +8,10 @@ class SearchStationDelegate extends SearchDelegate<Station> {
   SearchStationDelegate(List<Station> stations) {
     this.stations = stations;
     this.defaultStations = [
-      Station('bjx', '北京西'),
-      Station('shn', '上海南'),
-      Station('gzn', '广州南'),
-      Station('szb', '深圳北'),
+      Station('BXP', '北京西'),
+      Station('SNH', '上海南'),
+      Station('IZQ', '广州南'),
+      Station('IOQ', '深圳北'),
     ];
   }
 

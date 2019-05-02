@@ -20,7 +20,8 @@ class TabOneHomePage extends StatefulWidget {
   }
 }
 
-class TabOneHomePageState extends State<TabOneHomePage> {
+class TabOneHomePageState extends State<TabOneHomePage>
+    with AutomaticKeepAliveClientMixin {
   Station stationFrom;
   Station stationTo;
   DateTime dateTime;
@@ -133,13 +134,16 @@ class TabOneHomePageState extends State<TabOneHomePage> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 /// 起点站和终点站
 class LocationStationWidget extends StatefulWidget {
   final ValueChanged<List<Station>> valueChanged;
-  var stationFrom;
-  var stationTo;
+  Station stationFrom;
+  Station stationTo;
 
   LocationStationWidget({this.valueChanged, this.stationFrom, this.stationTo});
 
@@ -147,7 +151,8 @@ class LocationStationWidget extends StatefulWidget {
   LocationStationWidgetState createState() => LocationStationWidgetState();
 }
 
-class LocationStationWidgetState extends State<LocationStationWidget> {
+class LocationStationWidgetState extends State<LocationStationWidget>
+    with AutomaticKeepAliveClientMixin {
   List<Station> stations;
 
   LocationStationWidgetState() {
@@ -224,6 +229,9 @@ class LocationStationWidgetState extends State<LocationStationWidget> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 /// 乘车日期
@@ -237,7 +245,8 @@ class DateTimeWidget extends StatefulWidget {
   DateTimeWidgetState createState() => DateTimeWidgetState();
 }
 
-class DateTimeWidgetState extends State<DateTimeWidget> {
+class DateTimeWidgetState extends State<DateTimeWidget>
+    with AutomaticKeepAliveClientMixin {
   void _selectDate(BuildContext context) {
     var _dateTime = DateTime.now();
     var _firstDate = DateTime(_dateTime.year, _dateTime.month, _dateTime.day);
@@ -287,4 +296,7 @@ class DateTimeWidgetState extends State<DateTimeWidget> {
                   color: Colors.grey, width: 0.5, style: BorderStyle.solid))),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

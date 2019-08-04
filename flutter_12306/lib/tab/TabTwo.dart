@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 
 /// 选项卡：抢票
-class TabTwo extends StatelessWidget {
+class TabTwo extends StatefulWidget {
   @override
-  Widget build(BuildContext context) => TabTwoHomePage();
+  State<StatefulWidget> createState() {
+    return TabTwoHomePageState();
+  }
 }
 
-class TabTwoHomePage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => TabTwoHomePageState();
-}
-
-class TabTwoHomePageState extends State<TabTwoHomePage>
+class TabTwoHomePageState extends State<TabTwo>
     with AutomaticKeepAliveClientMixin {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(

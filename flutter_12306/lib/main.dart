@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage>
       appBar: AppBar(
         title: Text('12306Plus'),
         bottom: TabBar(
+          key: PageStorageKey(2),
           controller: _tabController,
           tabs: <Widget>[
             Tab(
@@ -58,6 +59,7 @@ class _MyHomePageState extends State<MyHomePage>
       ),
       drawer: Drawer(child: DrawerListView()),
       body: TabBarView(
+        key: PageStorageKey(2),
         children: <Widget>[
           TabOne(),
           TabTwo(),

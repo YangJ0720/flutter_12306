@@ -6,21 +6,15 @@ import 'package:flutter_12306/railway_ticket.dart';
 import 'package:flutter_12306/utils/DateUtils.dart';
 
 /// 选项卡：查询
-class TabOne extends StatelessWidget {
+class TabOne extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return TabOneHomePage();
-  }
-}
-
-class TabOneHomePage extends StatefulWidget {
-  @override
-  TabOneHomePageState createState() {
+  State<StatefulWidget> createState() {
     return TabOneHomePageState();
   }
+
 }
 
-class TabOneHomePageState extends State<TabOneHomePage>
+class TabOneHomePageState extends State<TabOne>
     with AutomaticKeepAliveClientMixin {
   Station stationFrom;
   Station stationTo;
@@ -39,6 +33,16 @@ class TabOneHomePageState extends State<TabOneHomePage>
     this.isFast = false;
     // 学生票
     this.isStudent = false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
